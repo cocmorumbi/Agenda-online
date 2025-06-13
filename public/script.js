@@ -61,7 +61,7 @@ function renderCalendar(date) {
       bookings[dateStr].forEach(b => {
         const label = document.createElement('div');
         label.style.fontSize = '10px';
-        label.style.background = '#cce5ff';
+        label.style.background = getCorPorLocal(b.local);
         label.style.marginTop = '5px';
         label.innerText = `${b.horario} - ${b.local} (${b.nome})`;
 
@@ -183,6 +183,32 @@ async function loadAndRender() {
   const month = currentDate.getMonth();
   await loadBookings(year, month);
   renderCalendar(currentDate);
+  carregarUltimosAgendamentos();
+}
+
+function carregarUltimosAgendamentos() {
+  fetch('/api/ultimos-agendamentos')
+    .then(res => res.json())
+    .then(dados => {
+      const lista = document.getElementById('ultimos-agendamentos');
+      if (!lista) return; // Garante que o elemento existe
+      lista.innerHTML = '';
+      dados.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.data} - ${item.horario} - ${item.nome} (${item.local})`;
+        li.style.color = getCorPorLocal(item.local); // aplica cor por local
+        lista.appendChild(li);
+      });
+    });
+}
+
+function getCorPorLocal(local) {
+  switch (local) {
+    case 'Informática': return '#4caf50';   // verde
+    case 'Auditório': return '#f44336';     // vermelho
+    case 'Química': return '#2196f3';       // azul
+    default: return '#999';                 // cinza padrão
+  }
 }
 
 // Inicializa calendário e dados

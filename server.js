@@ -87,3 +87,16 @@ app.delete('/api/agendamentos/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
+
+// Rota GET: últimos agendamentos
+app.get('/api/ultimos-agendamentos', (req, res) => {
+  db.all(
+    'SELECT * FROM agendamentos ORDER BY id DESC LIMIT 5',
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
+
