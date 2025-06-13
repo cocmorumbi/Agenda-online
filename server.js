@@ -88,11 +88,14 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
 
-// Rota GET: últimos agendamentos
+// Rota GET: próximas aulas
 app.get('/api/ultimos-agendamentos', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM agendamentos ORDER BY data DESC, horario DESC LIMIT 5'
+      'SELECT * FROM agendamentos 
+      WHERE data >= CURRENT_DATE
+      ORDER BY data ASC, horario ASC 
+      LIMIT 5'
     );
     res.json(result.rows);
   } catch (err) {
