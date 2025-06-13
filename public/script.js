@@ -212,4 +212,8 @@ function getCorPorLocal(local) {
 }
 
 // Inicializa calendário e dados
-loadAndRender();
+document.addEventListener('DOMContentLoaded', () => {
+  carregarUltimosAgendamentos();
+  loadAndRender();
+});
+
