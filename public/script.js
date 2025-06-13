@@ -186,21 +186,45 @@ async function loadAndRender() {
   carregarUltimosAgendamentos();
 }
 
-function carregarUltimosAgendamentos() {
-  fetch('/api/ultimos-agendamentos')
+function carregarProximasAulas() {
+  fetch('/api/proximas-aulas')
     .then(res => res.json())
     .then(dados => {
-      const lista = document.getElementById('ultimos-agendamentos');
-      if (!lista) return; // Garante que o elemento existe
-      lista.innerHTML = '';
-      dados.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.data} - ${item.horario} - ${item.nome} (${item.local})`;
-        li.style.color = getCorPorLocal(item.local); // aplica cor por local
-        lista.appendChild(li);
+      const tbody = document.querySelector('#proximas-aulas tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      dados.forEach(aula => {
+        const tr = document.createElement('tr');
+
+        const tdData = document.createElement('td');
+        tdData.textContent = aula.data;
+
+        const tdHorario = document.createElement('td');
+        tdHorario.textContent = aula.horario;
+
+        const tdProfessor = document.createElement('td');
+        tdProfessor.textContent = aula.nome;
+
+        const tdLocal = document.createElement('td');
+        tdLocal.textContent = aula.local;
+        tdLocal.style.color = getCorPorLocal(aula.local);
+
+        tr.appendChild(tdData);
+        tr.appendChild(tdHorario);
+        tr.appendChild(tdProfessor);
+        tr.appendChild(tdLocal);
+
+        tbody.appendChild(tr);
       });
     });
 }
+
+function formatarDataBonita(dataStr) {
+  const [ano, mes, dia] = dataStr.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
 
 function getCorPorLocal(local) {
   switch (local) {
@@ -213,7 +237,7 @@ function getCorPorLocal(local) {
 
 // Inicializa calendário e dados
 document.addEventListener('DOMContentLoaded', () => {
-  carregarUltimosAgendamentos();
+  carregarProximasAulas();
   loadAndRender();
 });
 

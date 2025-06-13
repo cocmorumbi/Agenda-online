@@ -15,8 +15,22 @@
       <button id="next">→</button>
     </div>
     <div class="calendar">
-      <h2>Próximas aulas</h2>
-      <ul id="ultimos-agendamentos"></ul>
+      <section>
+        <h2>Próximas Aulas</h2>
+        <table id="proximas-aulas">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Professor</th>
+              <th>Local</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- As aulas serão injetadas aqui via JS -->
+          </tbody>
+        </table>
+      </section>
 
       <!-- Modal de Agendamento -->
       <div id="modal" class="modal hidden">
