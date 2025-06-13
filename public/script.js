@@ -191,40 +191,50 @@ function carregarProximasAulas() {
     .then(res => res.json())
     .then(dados => {
       const tbody = document.querySelector('#proximas-aulas tbody');
-      if (!tbody) return;
-
       tbody.innerHTML = '';
-      dados.forEach(aula => {
-        const tr = document.createElement('tr');
 
-        const tdData = document.createElement('td');
-        tdData.textContent = aula.data;
+      const hoje = new Date();
+      hoje.setHours(0,0,0,0); // Zera horas para comparar só a data
 
-        const tdHorario = document.createElement('td');
-        tdHorario.textContent = aula.horario;
+      dados
+        .filter(aula => {
+          const dataAula = new Date(aula.data);
+          dataAula.setHours(0,0,0,0);
+          return dataAula >= hoje;
+        })
+        .forEach(aula => {
+          const tr = document.createElement('tr');
 
-        const tdProfessor = document.createElement('td');
-        tdProfessor.textContent = aula.nome;
+          const tdData = document.createElement('td');
+          tdData.textContent = formatarDataBonita(aula.data);
 
-        const tdLocal = document.createElement('td');
-        tdLocal.textContent = aula.local;
-        tdLocal.style.color = getCorPorLocal(aula.local);
+          const tdHorario = document.createElement('td');
+          tdHorario.textContent = aula.horario;
 
-        tr.appendChild(tdData);
-        tr.appendChild(tdHorario);
-        tr.appendChild(tdProfessor);
-        tr.appendChild(tdLocal);
+          const tdProfessor = document.createElement('td');
+          tdProfessor.textContent = aula.nome;
 
-        tbody.appendChild(tr);
-      });
+          const tdLocal = document.createElement('td');
+          tdLocal.textContent = aula.local;
+          tdLocal.style.color = getCorPorLocal(aula.local);
+
+          tr.appendChild(tdData);
+          tr.appendChild(tdHorario);
+          tr.appendChild(tdProfessor);
+          tr.appendChild(tdLocal);
+
+          tbody.appendChild(tr);
+        });
     });
 }
 
 function formatarDataBonita(dataStr) {
-  const [ano, mes, dia] = dataStr.split('-');
+  const data = new Date(dataStr);
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do 0
+  const ano = data.getFullYear();
   return `${dia}/${mes}/${ano}`;
 }
-
 
 function getCorPorLocal(local) {
   switch (local) {
