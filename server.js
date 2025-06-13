@@ -96,7 +96,7 @@ app.get('/api/proximas-aulas', async (req, res) => {
       SELECT * FROM agendamentos
       WHERE 
         (data >= CURRENT_DATE)
-        OR (data = CURRENT_DATE AND substring(horario from '^[0-9]{2}:[0-9]{2}')::time > CURRENT_TIME)
+        OR (data >= CURRENT_DATE AND substring(horario from '^[0-9]{2}:[0-9]{2}')::time >= CURRENT_TIME)
       ORDER BY data ASC, substring(horario from '^[0-9]{2}:[0-9]{2}')::time ASC
       LIMIT 5;
     `);
