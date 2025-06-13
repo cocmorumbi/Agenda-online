@@ -89,17 +89,17 @@ app.listen(PORT, () => {
 });
 
 // Rota GET: próximas aulas
+// Rota GET: próximos agendamentos
 app.get('/api/ultimos-agendamentos', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM agendamentos 
+    const result = await pool.query(`
+      SELECT * FROM agendamentos
       WHERE data >= CURRENT_DATE
-      ORDER BY data ASC, horario ASC 
-      LIMIT 5'
-    );
+      ORDER BY data ASC, horario ASC
+      LIMIT 5
+    `);
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
