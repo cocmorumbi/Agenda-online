@@ -230,6 +230,7 @@ function carregarProximasAulas() {
 
 function formatarDataBonita(dataStr) {
   const data = new Date(dataStr);
+  data.setHours(data.getHours() + 3);
   const dia = String(data.getDate()).padStart(2, '0');
   const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do 0
   const ano = data.getFullYear();
