@@ -89,14 +89,14 @@ app.listen(PORT, () => {
 });
 
 // Rota GET: últimos agendamentos
-app.get('/api/ultimos-agendamentos', (req, res) => {
-  db.all(
-    'SELECT * FROM agendamentos ORDER BY id DESC LIMIT 5',
-    [],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    }
-  );
+app.get('/api/ultimos-agendamentos', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM agendamentos ORDER BY data DESC, horario DESC LIMIT 5'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
