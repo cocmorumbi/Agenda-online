@@ -193,35 +193,14 @@ function carregarUltimosAgendamentos() {
       const lista = document.getElementById('ultimos-agendamentos');
       if (!lista) return; // Garante que o elemento existe
       lista.innerHTML = '';
-      const lista = document.getElementById('ultimos-agendamentos');
-      if (!lista) return;
-      lista.innerHTML = '';
-
       dados.forEach(item => {
-        const linha = document.createElement('div');
-        linha.className = 'agendamento-linha';
-
-        const spanData = document.createElement('span');
-        spanData.textContent = item.data;
-
-        const spanHorario = document.createElement('span');
-        spanHorario.textContent = item.horario;
-
-        const spanNome = document.createElement('span');
-        spanNome.textContent = item.nome;
-
-        const spanLocal = document.createElement('span');
-        spanLocal.textContent = item.local;
-        spanLocal.style.color = getCorPorLocal(item.local);
-
-        linha.appendChild(spanData);
-        linha.appendChild(spanHorario);
-        linha.appendChild(spanNome);
-        linha.appendChild(spanLocal);
-
-        lista.appendChild(linha);
+        const li = document.createElement('li');
+        li.textContent = `${item.data} - ${item.horario} - ${item.nome} (${item.local})`;
+        li.style.color = getCorPorLocal(item.local); // aplica cor por local
+        lista.appendChild(li);
       });
-
+    });
+}
 
 function getCorPorLocal(local) {
   switch (local) {

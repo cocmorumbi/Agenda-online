@@ -104,32 +104,3 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
-
-.agendamentos-tabela {
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-.agendamentos-header,
-.agendamento-linha {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr 1fr;
-  padding: 10px;
-}
-
-.agendamentos-header {
-  background-color: #f5f5f5;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
-}
-
-.agendamento-linha:nth-child(even) {
-  background-color: #fafafa;
-}
-
-.agendamento-linha span {
-  padding: 4px 0;
-}
