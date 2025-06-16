@@ -193,14 +193,16 @@ function carregarProximasAulas() {
       const tbody = document.querySelector('#proximas-aulas tbody');
       tbody.innerHTML = '';
 
-      const hoje = new Date();
-      hoje.setHours(0,0,0,0); // Zera horas para comparar só a data
+      const agora = new Date();
 
       dados
         .filter(aula => {
-          const dataAula = new Date(aula.data);
-          dataAula.setHours(0,0,0,0);
-          return dataAula >= hoje;
+          const [ano, mes, dia] = aula.data.split('-');
+          const [hora, minuto] = aula.horario.split(':');
+
+          const dataHoraAula = new Date(ano, mes - 1, dia, hora, minuto);
+
+          return dataHoraAula >= agora;
         })
         .forEach(aula => {
           const tr = document.createElement('tr');
@@ -242,6 +244,7 @@ function getCorPorLocal(local) {
     case 'Informática': return '#4caf50';   // verde
     case 'Auditório': return '#f44336';     // vermelho
     case 'Química': return '#2196f3';       // azul
+    case 'Matemática': return '#ffff00';    // amarelo
     default: return '#999';                 // cinza padrão
   }
 }
