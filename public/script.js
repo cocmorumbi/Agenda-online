@@ -12,7 +12,7 @@ const locationSelect = document.getElementById('location');
 const horariosFixos = [
   "07:10/08:00", "08:00/08:50", "09:20/10:10", "10:10/11:00", "11:00/11:50",
   "11:50/12:40", "13:10/14:00", "14:00/14:50", "14:50/15:40",
-  "16:10/17:00", "17:00/17:50"
+  "16:10/17:00"
 ];
 
 let currentDate = new Date();
