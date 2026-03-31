@@ -3,35 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agenda Online</title>
+  <title>Agenda de Salas</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Agenda Mensal</h1>
+    <h1>Agenda de Laboratórios</h1>
     <div class="header">
       <button id="prev">←</button>
-      <h2 id="month-year"></h2>
+      <h1 id="month-year"></h1>
       <button id="next">→</button>
     </div>
     <div class="calendar">
-      <section>
-        <h2>Próximas Aulas</h2>
-        <table id="proximas-aulas">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Horário</th>
-              <th>Professor</th>
-              <th>Local</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- As aulas serão injetadas aqui via JS -->
-          </tbody>
-        </table>
-      </section>
-
+      
       <!-- Modal de Agendamento -->
       <div id="modal" class="modal hidden">
         <div class="modal-content">
