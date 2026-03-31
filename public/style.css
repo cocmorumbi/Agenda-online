@@ -14,7 +14,7 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   margin-top: 40px;
   padding: 10px;
   background: #fff;
@@ -74,8 +74,9 @@ body {
 }
 
 .days div {
+  box-sizing: border-box;
   text-align: center;
-  padding: 8px 0;
+  padding: 6px 0;
   background: #e0e0e0;
   border-radius: 4px;
   cursor: pointer;
