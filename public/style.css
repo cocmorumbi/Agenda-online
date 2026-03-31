@@ -47,7 +47,7 @@ body {
   align-items: center;
   justify-content: center;
 
-  transition: all 1.0s ease;
+  transition: all 0.7s ease;
 }
 
 .header h2 {
@@ -113,7 +113,7 @@ body {
 
 .modal-content h3 {
   margin-top: 0;
-  justify-content: center;
+  align-items: center;
 }
 
 .modal-content input,
@@ -126,7 +126,7 @@ body {
 
 .modal-content button {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   background-color: #2d89ef;
   color: white;
   border: 5px;
