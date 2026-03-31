@@ -63,7 +63,7 @@ body {
 .weekdays, .days {
   display: grid;
   overflow: hidden;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 }
 

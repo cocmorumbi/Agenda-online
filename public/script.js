@@ -53,9 +53,18 @@ function renderCalendar(date) {
   }
 
   for (let day = 1; day <= lastDate; day++) {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.gatDay();
+
+    if (dayOfWeek === 0 || dayOfWeek === 6){
+      continue; 
+    }
+
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dayCell = document.createElement('div');
     dayCell.innerText = day;
+
+    document.querySelector('.days').appendChild(dayCell);
 
     if (bookings[dateStr]) {
       bookings[dateStr].forEach(b => {
