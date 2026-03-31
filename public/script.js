@@ -39,13 +39,17 @@ async function loadBookings(year, month) {
 function renderCalendar(date) {
   const year = date.getFullYear();
   const month = date.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
   const lastDate = new Date(year, month + 1, 0).getDate();
 
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
                       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   monthYear.innerText = `${monthNames[month]} ${year}`;
   daysContainer.innerHTML = '';
+
+  let firstDay = new Date(year, month, 1).getDay();
+  if (firstDay === 0) firstDay = 7;
+  firstDay = firstDay - 1;
+  if (firstDay > 4) firstDay = 0;
 
   // preenche os dias vazios até o primeiro dia da semana
   for (let i = 0; i < firstDay; i++) {
