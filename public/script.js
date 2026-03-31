@@ -54,7 +54,7 @@ function renderCalendar(date) {
 
   for (let day = 1; day <= lastDate; day++) {
     const date = new Date(year, month, day);
-    const dayOfWeek = date.gatDay();
+    const dayOfWeek = date.getDay();
 
     if (dayOfWeek === 0 || dayOfWeek === 6){
       continue; 
@@ -107,7 +107,6 @@ function renderCalendar(date) {
       modal.classList.remove('hidden');
     });
 
-    daysContainer.appendChild(dayCell);
   }
 }
 
