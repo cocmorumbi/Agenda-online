@@ -5,12 +5,17 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  
 }
 
 .container {
-  max-width: 700px;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
   margin-top: 40px;
-  padding: 20px;
+  padding: 10px;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
@@ -20,6 +25,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  border: 5px solid #4caf50;
+  border-radius: 50px;
+  padding: 10px;
+  background: #70ff63; 
 }
 
 .header h2 {
@@ -103,20 +113,6 @@ body {
   float: right;
   font-size: 20px;
   cursor: pointer;
-}
-
-#proximas-aulas {
-  margin-top: 40px;
-  padding: 20px;
-  background: #f8f8f8;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-#proximas-aulas h2 {
-  margin-bottom: 15px;
-  font-size: 1.5em;
-  color: #333;
 }
 
 .tabela-aulas {
