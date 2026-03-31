@@ -47,7 +47,7 @@ body {
   align-items: center;
   justify-content: center;
 
-  transition: all 0.7s ease;
+  transition: all 1.0s ease;
 }
 
 .header h2 {
@@ -68,7 +68,8 @@ body {
   font-weight: bold;
   text-align: center;
   padding: 10px 0;
-  border: 3px solid rgb(157, 255, 0);
+  border: 3px solid #33363b;
+  background: rgb(157, 255, 0);
   border-radius: 10px;
 }
 
@@ -112,7 +113,7 @@ body {
 
 .modal-content h3 {
   margin-top: 0;
-  align-items: center;
+  justify-content: center;
 }
 
 .modal-content input,
@@ -125,11 +126,11 @@ body {
 
 .modal-content button {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   background-color: #2d89ef;
   color: white;
   border: 5px;
-  border-color: #0616fa;
+  border-color: #2d3aef;
   border-radius: 10px;
   cursor: pointer;
 }
