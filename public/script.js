@@ -198,49 +198,6 @@ async function loadAndRender() {
   carregarUltimosAgendamentos();
 }
 
-function carregarProximasAulas() {
-  fetch('/api/proximas-aulas')
-    .then(res => res.json())
-    .then(dados => {
-      const tbody = document.querySelector('#proximas-aulas tbody');
-      tbody.innerHTML = '';
-
-      const agora = new Date();
-
-      dados
-        .filter(aula => {
-          const [ano, mes, dia] = aula.data.split('-');
-          const [hora, minuto] = aula.horario.split(':');
-
-          const dataHoraAula = new Date(ano, mes - 1, dia, hora, minuto);
-
-          return dataHoraAula >= agora;
-        })
-        .forEach(aula => {
-          const tr = document.createElement('tr');
-
-          const tdData = document.createElement('td');
-          tdData.textContent = formatarDataBonita(aula.data);
-
-          const tdHorario = document.createElement('td');
-          tdHorario.textContent = aula.horario;
-
-          const tdProfessor = document.createElement('td');
-          tdProfessor.textContent = aula.nome;
-
-          const tdLocal = document.createElement('td');
-          tdLocal.textContent = aula.local;
-          tdLocal.style.color = getCorPorLocal(aula.local);
-
-          tr.appendChild(tdData);
-          tr.appendChild(tdHorario);
-          tr.appendChild(tdProfessor);
-          tr.appendChild(tdLocal);
-
-          tbody.appendChild(tr);
-        });
-    });
-}
 
 function formatarDataBonita(dataStr) {
   const data = new Date(dataStr);
