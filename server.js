@@ -88,4 +88,20 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
 
-
+// Rota GET: próximas aulas
+// Rota GET: próximos agendamentos
+app.get('/api/proximas-aulas', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM agendamentos
+      WHERE 
+        (data > CURRENT_DATE)
+        OR (data = CURRENT_DATE AND substring(horario from '^[0-9]{2}:[0-9]{2}')::time >= CURRENT_TIME)
+      ORDER BY data ASC, substring(horario from '^[0-9]{2}:[0-9]{2}')::time ASC
+      LIMIT 5;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
