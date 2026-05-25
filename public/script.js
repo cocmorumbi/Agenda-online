@@ -261,6 +261,10 @@ function getCorPorLocal(local) {
   }
 }
 
+setInterval(() => {
+  loadAndRender();
+}, 60000);
+
 // Inicializa calendário e dados
 document.addEventListener('DOMContentLoaded', () => {
   carregarProximasAulas();
