@@ -27,10 +27,10 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  border: 5px solid #33363b;
+  border: 5px solid #242527;
   border-radius: 50px;
   padding: 10px;
-  background: rgb(157, 255, 0); 
+  background: #ff3131; 
 }
 
 .header button {
@@ -71,8 +71,8 @@ body {
   font-weight: bold;
   text-align: center;
   padding: 10px 0;
-  border: 3px solid #33363b;
-  background: rgb(157, 255, 0);
+  border: 3px solid #242527;
+  background: #ff3131;
   border-radius: 10px;
   box-sizing: border-box;
   max-width: 100%;
@@ -86,7 +86,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   min-height: 60px;
-  border: 3px solid #33363b;
+  border: 3px solid #242527;
   border-radius: 10px;
 }
 
