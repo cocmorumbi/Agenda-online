@@ -262,7 +262,7 @@ function getCorPorLocal(local) {
 
 setInterval(() => {
   loadAndRender();
-}, 60000);
+}, 600000);
 
 // Inicializa calendário e dados
 document.addEventListener('DOMContentLoaded', () => {

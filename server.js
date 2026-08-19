@@ -83,6 +83,23 @@ app.delete('/api/agendamentos/:id', async (req, res) => {
   }
 });
 
+async function limparAgendamentosAntigos() {
+    try {
+        await pool.query(`
+            DELETE FROM agendamentos
+            WHERE data < CURRENT_DATE - INTERVAL '6 months'
+        `);
+
+        console.log('🧹 Agendamentos com mais de 6 meses removidos.');
+    } catch (error) {
+        console.error('❌ Erro ao limpar agendamentos antigos:', error.message);
+    }
+}
+
+limparAgendamentosAntigos();
+
+setInterval(limparAgendamentosAntigos, 24 * 60 * 60 * 1000);
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
