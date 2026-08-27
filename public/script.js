@@ -10,21 +10,31 @@ const timeSelect = document.getElementById('time');
 const locationSelect = document.getElementById('location');
 
 const horariosFixos = [
-  "07:10/08:00", "08:00/08:50", "09:20/10:10", "10:10/11:00", "11:00/11:50",
+  "07:10/08:00", "08:00/08:50", "09:00/10:10", "10:10/11:00", "11:00/11:50",
   "11:50/12:40", "13:10/14:00", "14:00/14:50", "14:50/15:40", "16:10/17:00"
 ];
 
 let currentDate = new Date();
 let bookings = {}; // armazenará agendamentos carregados do backend
 
-// Função para carregar agendamentos de um mês (todo mês, para facilitar visualização)
-async function loadBookings(year, month) {
-  bookings = {}; // limpa
+// Pede permissão para enviar notificações assim que a página carrega
+async function solicitarPermissaoNotificacao() {
+  if ('Notification' in window) {
+    const permissao = await Notification.requestPermission();
+    if (permissao === 'granted') {
+      console.log('Permissão para notificações concedida!');
+    }
+  }
+}
 
-  // Para cada dia do mês, faz requisição para buscar agendamentos daquele dia
+solicitarPermissaoNotificacao();
+
+// Função para carregar agendamentos de um mês
+async function loadBookings(year, month) {
+  bookings = {}; 
+
   const lastDate = new Date(year, month + 1, 0).getDate();
 
-  // Buscar todos os dias paralelamente
   const promises = [];
   for (let day = 1; day <= lastDate; day++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -50,7 +60,6 @@ function renderCalendar(date) {
   firstDay = firstDay - 1;
   if (firstDay > 4) firstDay = 0;
 
-  // preenche os dias vazios até o primeiro dia da semana
   for (let i = 0; i < firstDay; i++) {
     daysContainer.appendChild(document.createElement('div'));
   }
@@ -77,7 +86,6 @@ function renderCalendar(date) {
         label.style.marginTop = '5px';
         label.innerText = `${b.horario} - ${b.local} (${b.nome})`;
 
-        // Botão cancelar
         const btnCancel = document.createElement('button');
         btnCancel.textContent = 'Cancelar';
         btnCancel.style.marginLeft = '5px';
@@ -88,14 +96,12 @@ function renderCalendar(date) {
             fetch(`/api/agendamentos/${b.id}`, { method: 'DELETE' })
               .then(res => {
                 if (!res.ok) throw new Error('Erro ao cancelar');
-                // Recarrega agendamentos e calendário
                 loadAndRender();
               })
               .catch(err => {
                 console.error('Erro ao cancelar agendamento:', err);
                 alert('Erro ao cancelar agendamento: ' + err.message);
               });
-
           }
         });
 
@@ -109,14 +115,12 @@ function renderCalendar(date) {
       updateHorariosDisponiveis(dateStr);
       modal.classList.remove('hidden');
     });
-
   }
 }
 
 function updateHorariosDisponiveis(date) {
   const selectedLocation = locationSelect.value;
   if (!selectedLocation) {
-    // limpa opções se local não selecionado
     timeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
     return;
   }
@@ -167,6 +171,14 @@ bookingForm.addEventListener('submit', async (e) => {
     }
     if (!res.ok) throw new Error('Erro ao salvar agendamento');
 
+    // --- AGENDAMENTO DA NOTIFICAÇÃO ---
+    // Pega o horário inicial do intervalo (Ex: de "07:10/08:00" extrai "07:10")
+    const horaInicial = horario.split('/')[0];
+    const dataHoraAgendamento = `${data}T${horaInicial}`;
+
+    // Dispara a programação da notificação no celular
+    agendarLembreteLocal(nome, local, dataHoraAgendamento);
+
     bookingForm.reset();
     modal.classList.add('hidden');
     loadAndRender();
@@ -202,6 +214,7 @@ function carregarProximasAulas() {
     .then(res => res.json())
     .then(dados => {
       const tbody = document.querySelector('#proximas-aulas tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       const agora = new Date();
@@ -209,10 +222,10 @@ function carregarProximasAulas() {
       dados
         .filter(aula => {
           const [ano, mes, dia] = aula.data.split('-');
-          const [hora, minuto] = aula.horario.split(':');
+          const horaInicial = aula.horario.split('/')[0];
+          const [hora, minuto] = horaInicial.split(':');
 
           const dataHoraAula = new Date(ano, mes - 1, dia, hora, minuto);
-
           return dataHoraAula >= agora;
         })
         .forEach(aula => {
@@ -245,18 +258,33 @@ function formatarDataBonita(dataStr) {
   const data = new Date(dataStr);
   data.setHours(data.getHours() + 3);
   const dia = String(data.getDate()).padStart(2, '0');
-  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do 0
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
   const ano = data.getFullYear();
   return `${dia}/${mes}/${ano}`;
 }
 
 function getCorPorLocal(local) {
   switch (local) {
-    case 'Informática': return '#4caf50';   // verde
-    case 'Auditório': return '#f44336';     // vermelho
-    case 'Química': return '#2196f3';       // azul
-    case 'Matemática': return '#ffff00';    // amarelo
-    default: return '#999';                 // cinza padrão
+    case 'Informática': return '#4caf50';
+    case 'Auditório': return '#f44336';
+    case 'Química': return '#2196f3';
+    case 'Matemática': return '#ffff00';
+    default: return '#999';
+  }
+}
+
+// VERSÃO DE TESTE RÁPIDO (5 SEGUNDOS)
+function agendarLembreteLocal(nome, sala, dataHoraAgendamento) {
+  if ('serviceWorker' in navigator) {
+    setTimeout(() => {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification('Lembrete de Agendamento 📅', {
+          body: `${nome}, sua aula na sala ${sala} começa em breve!`,
+          icon: '/icon.png',
+          vibrate: [200, 100, 200]
+        });
+      });
+    }, 5000); // Dispara exatamente 5 segundos após salvar!
   }
 }
 
@@ -264,9 +292,7 @@ setInterval(() => {
   loadAndRender();
 }, 600000);
 
-// Inicializa calendário e dados
 document.addEventListener('DOMContentLoaded', () => {
   carregarProximasAulas();
   loadAndRender();
 });
-
