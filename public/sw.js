@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'agenda-aulas-v1';
+const CACHE_NAME = 'agenda-aulas-v1.001';
 
 // Evento de instalação do Service Worker
 self.addEventListener('install', (event) => {
