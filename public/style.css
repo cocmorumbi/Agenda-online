@@ -13,11 +13,12 @@ body {
 .container {
   align-items: center;
   justify-content: center;
+  text-align: center;
   width: 100%;
   max-width: 500px;
   margin-top: 40px;
   padding: 10px;
-  background: #fff;
+  background: #fcfcfc;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
 }
