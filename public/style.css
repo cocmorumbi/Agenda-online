@@ -31,7 +31,7 @@ body {
   border: 5px solid #242527;
   border-radius: 50px;
   padding: 10px;
-  background: #ff3131; 
+  background: #6f9c22; 
 }
 
 .header button {
@@ -73,7 +73,7 @@ body {
   text-align: center;
   padding: 10px 0;
   border: 3px solid #242527;
-  background: #ff3131;
+  background: #6f9c22;
   border-radius: 10px;
   box-sizing: border-box;
   max-width: 100%;
@@ -133,10 +133,10 @@ body {
 .modal-content button {
   width: 100%;
   padding: 10px;
-  background-color: #2d89ef;
+  background-color: #48494b;
   color: white;
   border: 5px;
-  border-color: #2d3aef;
+  border-color: #ffee00;
   border-radius: 10px;
   cursor: pointer;
 }
