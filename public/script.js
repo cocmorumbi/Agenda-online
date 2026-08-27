@@ -273,18 +273,24 @@ function getCorPorLocal(local) {
   }
 }
 
-// VERSÃO DE TESTE RÁPIDO (5 SEGUNDOS)
 function agendarLembreteLocal(nome, sala, dataHoraAgendamento) {
-  if ('serviceWorker' in navigator) {
+  const horaDoEvento = new Date(dataHoraAgendamento).getTime();
+  const agora = new Date().getTime();
+
+  // 10 minutos em milissegundos
+  const dezMinutosEmMs = 10 * 60 * 1000;
+  const tempoAteODisparo = (horaDoEvento - dezMinutosEmMs) - agora;
+
+  if (tempoAteODisparo > 0 && 'serviceWorker' in navigator) {
     setTimeout(() => {
       navigator.serviceWorker.ready.then((registration) => {
         registration.showNotification('Lembrete de Agendamento 📅', {
-          body: `${nome}, sua aula na sala ${sala} começa em breve!`,
+          body: `Olá ${nome}, sua aula no laboratório de ${sala} começa em 10 minutos!`,
           icon: '/icon.png',
           vibrate: [200, 100, 200]
         });
       });
-    }, 5000); // Dispara exatamente 5 segundos após salvar!
+    }, tempoAteODisparo);
   }
 }
 
