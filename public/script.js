@@ -178,7 +178,21 @@ function abrirDrawer(dateStr, dataObj) {
 
   // Reseta o formulário interno da gaveta
   if (drawerForm) drawerForm.reset();
-  if (drawerTimeSelect) drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+
+  // PREENCHIMENTO AUTOMÁTICO BASEADO NO FILTRO DO TOPO
+  const salaFiltroAtual = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
+  
+  if (drawerLocationSelect) {
+    if (salaFiltroAtual !== 'todas') {
+      drawerLocationSelect.value = salaFiltroAtual; // Seleciona a sala do filtro
+      updateHorariosDisponiveisDrawer();            // Já carrega os horários vagos dela
+    } else {
+      drawerLocationSelect.value = '';             // Deixa em branco para o usuário escolher
+      if (drawerTimeSelect) {
+        drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+      }
+    }
+  }
 
   renderizarListaDrawer(dateStr);
   drawerDetalhes.classList.remove('hidden');
@@ -343,10 +357,10 @@ async function loadAndRender() {
 
 function getCorPorLocal(local) {
   switch (local) {
-    case 'Informática': return '#2563eb';
-    case 'Auditório': return '#9333ea';
-    case 'Química': return '#16a34a';
-    case 'Matemática': return '#ea580c';
+    case 'Informática': return '#00ff22';
+    case 'Auditório': return '#ea3333';
+    case 'Química': return '#0077ff';
+    case 'Matemática': return '#e5ff00';
     default: return '#6b7280';
   }
 }
