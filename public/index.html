@@ -29,42 +29,73 @@
 <body>
   <div class="container">
     <h1>Agenda de Laboratórios</h1>
+
+    <!-- Filtro de Laboratório no Topo -->
+    <div class="filtro-container">
+      <label for="filtro-sala">Filtrar por Sala:</label>
+      <select id="filtro-sala" onchange="filtrarEAtualizarAgenda()">
+        <option value="todas">Todas as Salas</option>
+        <option value="Informática">Informática</option>
+        <option value="Auditório">Auditório</option>
+        <option value="Química">Química</option>
+        <option value="Matemática">Matemática</option>
+      </select>
+    </div>
+
+    <!-- Navegação de Mês/Ano -->
     <div class="header">
       <button id="prev">◀</button>
       <h2 id="month-year"></h2>
       <button id="next">▶</button>
     </div>
-    <div class="calendar">
-      
-      <!-- Modal de Agendamento -->
-      <div id="modal" class="modal hidden">
-        <div class="modal-content">
-          <span id="close-modal" class="close">&times;</span>
-          <h3>Agendamento</h3>
-          <form id="booking-form">
-            <input type="text" id="name" placeholder="Seu nome" required />
-            <select id="time" required>
-              <option value="">Selecione o horário</option>
-            </select>
-            <select id="location" required>
-              <option value="">Selecione o local</option>
-              <option value="Informática">Informática</option>
-              <option value="Auditório">Auditório</option>
-              <option value="Química">Química</option>
-              <option value="Matemática">Matemática</option>
-            </select>
-            <input type="hidden" id="selected-date" />
-            <button type="submit">Salvar</button>
-          </form>
-        </div>
-      </div>
 
+    <!-- Container das Semanas Dobráveis (Geradas via JS) -->
+    <div class="calendar" id="calendar-container">
       <div class="weekdays">
         <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div>
       </div>
-      <div class="days" id="days"></div>
+      <div id="weeks-wrapper"></div>
     </div>
   </div>
+
+  <!-- Modal de Novo Agendamento -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <h3>Novo Agendamento</h3>
+      <form id="booking-form">
+        <input type="text" id="name" placeholder="Seu nome" required />
+        <select id="time" required>
+          <option value="">Selecione o horário</option>
+        </select>
+        <select id="location" required>
+          <option value="">Selecione o local</option>
+          <option value="Informática">Informática</option>
+          <option value="Auditório">Auditório</option>
+          <option value="Química">Química</option>
+          <option value="Matemática">Matemática</option>
+        </select>
+        <input type="hidden" id="selected-date" />
+        <button type="submit">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Gaveta Lateral / Inferior (Drawer) dos Detalhes do Dia -->
+  <div id="drawer-detalhes" class="drawer-overlay hidden" onclick="fecharDrawerNoFundo(event)">
+    <div class="drawer-card">
+      <div class="drawer-header">
+        <h3 id="drawer-data-titulo">Agendamentos do Dia</h3>
+        <button class="drawer-close" onclick="fecharDrawer()">&times;</button>
+      </div>
+      <div id="drawer-lista-agendamentos" class="drawer-body">
+        <!-- Lista de agendamentos do dia entra aqui dinamicamente -->
+      </div>
+      <button id="btn-novo-agendamento-drawer" class="btn-novo-agendamento">+ Agendar neste dia</button>
+    </div>
+  </div>
+
+  <!-- Service Worker Script -->
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
@@ -76,12 +107,12 @@
     }
   </script>
 
-  <!-- Botão Flutuante de Ajuda -->
+  <!-- Botão Flutuante de Ajuda iOS -->
   <button id="btn-ajuda-ios" class="btn-ajuda-ios" onclick="abrirGuiaIOS()" style="display: none;">
     <span>📲 Guia de instalação para iPhone</span>
   </button>
 
-  <!-- Modal com o Conteúdo Trabalhado do Passo a Passo -->
+  <!-- Modal de Instalação iOS -->
   <div id="modal-guia-ios" class="ios-modal-overlay" style="display: none;" onclick="fecharGuiaIOSNoFundo(event)">
     <div class="ios-modal-card">
       <button class="ios-modal-close" onclick="fecharGuiaIOS()">&times;</button>

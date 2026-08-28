@@ -7,7 +7,6 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  
 }
 
 .container {
@@ -16,85 +15,200 @@ body {
   text-align: center;
   width: 100%;
   max-width: 500px;
-  margin-top: 40px;
-  padding: 10px;
+  margin-top: 20px;
+  padding: 15px;
   background: #fcfcfc;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
+/* Container do Filtro por Sala */
+.filtro-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f4e8;
+  border: 2px solid #6f9c22;
+  padding: 8px 14px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #242527;
+}
+
+.filtro-container select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #242527;
+  background: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Header de Navegação do Mês */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  border: 5px solid #242527;
+  border: 4px solid #242527;
   border-radius: 50px;
-  padding: 10px;
-  background: #6f9c22; 
+  padding: 8px 16px;
+  background: #6f9c22;
+  color: #ffffff;
 }
 
 .header button {
   background: #ffffff;
-  color: rgb(0, 0, 0);
-  border: 3px solid rgb(0, 0, 0); 
-  border-radius: 90px;
-  padding: 10px 10px;
-  font-size: 15px;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease;
+}
 
-  transition: all 0.7s ease;
+.header button:active {
+  transform: scale(0.9);
 }
 
 .header h2 {
   margin: 0;
+  font-size: 18px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 .calendar {
-  margin-top: 20px;
+  margin-top: 15px;
   width: 100%;
   overflow-x: hidden;
 }
 
-.weekdays, .days {
+.weekdays {
   display: grid;
-  overflow: hidden;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
+  margin-bottom: 8px;
 }
 
 .weekdays div {
   font-weight: bold;
   text-align: center;
-  padding: 10px 0;
-  border: 3px solid #242527;
+  padding: 8px 0;
+  border: 2px solid #242527;
   background: #6f9c22;
-  border-radius: 10px;
-  box-sizing: border-box;
-  max-width: 100%;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 13px;
 }
 
-.days div {
+/* Estilização dos Blocos de Semanas (Accordion) */
+.semana-bloco {
+  border: 2px solid #242527;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.semana-header {
+  background: #e0e0e0;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.semana-bloco.ativa .semana-header {
+  background: #6f9c22;
+  color: #ffffff;
+}
+
+.semana-bloco.recolhida .semana-corpo {
+  display: none;
+}
+
+.semana-dias-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  padding: 8px;
+}
+
+/* Cards dos Dias */
+.dia-card {
   box-sizing: border-box;
   text-align: center;
-  padding: 6px 0;
-  background: #e0e0e0;
-  border-radius: 4px;
+  padding: 6px 2px;
+  background: #f0f0f0;
   cursor: pointer;
-  min-height: 60px;
-  border: 3px solid #242527;
-  border-radius: 10px;
+  min-height: 58px;
+  border: 2px solid #242527;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s;
 }
 
-.days div:hover {
+.dia-card:hover {
   background: #d3eaff;
 }
 
+.dia-card.hoje {
+  background: #fff8d6;
+  border-color: #6f9c22;
+}
+
+.dia-card.fora-mes {
+  opacity: 0.4;
+}
+
+.dia-num {
+  font-weight: bold;
+  font-size: 14px;
+  color: #242527;
+}
+
+/* Pontinhos Indicadores (Dots) */
+.dots-container {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.Informatica { background-color: #2563eb; }
+.dot.Auditorio   { background-color: #9333ea; }
+.dot.Quimica     { background-color: #16a34a; }
+.dot.Matematica  { background-color: #ea580c; }
+.dot.Padrao      { background-color: #6b7280; }
+
+/* Modal Tradicional */
 .modal {
   position: fixed;
   top: 0;
@@ -105,6 +219,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 9990;
 }
 
 .modal.hidden {
@@ -114,65 +229,178 @@ body {
 .modal-content {
   background: white;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 300px;
+  border: 3px solid #242527;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .modal-content h3 {
   margin-top: 0;
+  color: #242527;
 }
 
 .modal-content input,
 .modal-content select {
   width: 100%;
-  padding: 8px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .modal-content button {
   width: 100%;
   padding: 10px;
-  background-color: #48494b;
+  background-color: #6f9c22;
   color: white;
-  border: 5px;
-  border-color: #ffee00;
-  border-radius: 10px;
+  border: 2px solid #242527;
+  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .close {
   float: right;
-  font-size: 40px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+}
+
+/* Gaveta Lateral/Inferior (Drawer) */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 9995;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.hidden {
+  display: none;
+}
+
+.drawer-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  border: 3px solid #242527;
+  border-bottom: none;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.drawer-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #242527;
+}
+
+.drawer-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.drawer-body {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.item-agendamento {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 6px solid #6f9c22;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+}
+
+.item-agendamento.Informatica { border-left: 6px solid #00ff22; }
+.item-agendamento.Auditorio   { border-left: 6px solid #ea3333; }
+.item-agendamento.Quimica     { border-left: 6px solid #0077ff; }
+.item-agendamento.Matematica  { border-left: 6px solid #e5ff00; }
+
+.item-agendamento-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #111;
+}
+
+.item-agendamento-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.btn-cancelar-item {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.tabela-aulas {
+.btn-novo-agendamento {
   width: 100%;
-  border-collapse: collapse;
-}
-
-.tabela-aulas th,
-.tabela-aulas td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-.tabela-aulas th {
-  background-color: #4caf50;
+  background: #6f9c22;
   color: white;
+  border: 2px solid #242527;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.tabela-aulas tr:nth-child(even) {
-  background-color: #f2f2f2;
+.sem-agendamento-msg {
+  text-align: center;
+  color: #777;
+  font-size: 13px;
+  padding: 20px 0;
 }
 
-.tabela-aulas tr:hover {
-  background-color: #e0f7fa;
-}
-
-/*Botao*/
+/* Estilos do Botão e Modal Guia iOS */
 .btn-ajuda-ios {
   position: fixed;
   bottom: 20px;
@@ -317,4 +545,4 @@ body {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-} 
+}
