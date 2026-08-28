@@ -17,18 +17,6 @@ const horariosFixos = [
 let currentDate = new Date();
 let bookings = {}; // armazenará agendamentos carregados do backend
 
-// Pede permissão para enviar notificações assim que a página carrega
-async function solicitarPermissaoNotificacao() {
-  if ('Notification' in window) {
-    const permissao = await Notification.requestPermission();
-    if (permissao === 'granted') {
-      console.log('Permissão para notificações concedida!');
-    }
-  }
-}
-
-solicitarPermissaoNotificacao();
-
 // Função para carregar agendamentos de um mês
 async function loadBookings(year, month) {
   bookings = {}; 
@@ -159,25 +147,26 @@ bookingForm.addEventListener('submit', async (e) => {
     return;
   }
 
+  let onesignalId = null;
+  if (window.OneSignal) {
+    try {
+      onesignalId = await OneSignal.User.PushSubscription.id;
+    } catch (err) {
+      console.log("Não foi possível obter ID do OneSignal:", err);
+    }
+  }
+
   try {
     const res = await fetch('/api/agendamentos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, data, horario, local }),
+      body: JSON.stringify({ nome, data, horario, local, onesignalId }),
     });
     if (res.status === 409) {
       alert("Horário já reservado para esse local.");
       return;
     }
     if (!res.ok) throw new Error('Erro ao salvar agendamento');
-
-    // --- AGENDAMENTO DA NOTIFICAÇÃO ---
-    // Pega o horário inicial do intervalo (Ex: de "07:10/08:00" extrai "07:10")
-    const horaInicial = horario.split('/')[0];
-    const dataHoraAgendamento = `${data}T${horaInicial}`;
-
-    // Dispara a programação da notificação no celular
-    agendarLembreteLocal(nome, local, dataHoraAgendamento);
 
     bookingForm.reset();
     modal.classList.add('hidden');
@@ -206,7 +195,6 @@ async function loadAndRender() {
   const month = currentDate.getMonth();
   await loadBookings(year, month);
   renderCalendar(currentDate);
-  carregarUltimosAgendamentos();
 }
 
 function carregarProximasAulas() {
@@ -273,30 +261,9 @@ function getCorPorLocal(local) {
   }
 }
 
-function agendarLembreteLocal(nome, sala, dataHoraAgendamento) {
-  const horaDoEvento = new Date(dataHoraAgendamento).getTime();
-  const agora = new Date().getTime();
-
-  // 10 minutos em milissegundos
-  const dezMinutosEmMs = 10 * 60 * 1000;
-  const tempoAteODisparo = (horaDoEvento - dezMinutosEmMs) - agora;
-
-  if (tempoAteODisparo > 0 && 'serviceWorker' in navigator) {
-    setTimeout(() => {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.showNotification('Lembrete de Agendamento 📅', {
-          body: `Olá ${nome}, sua aula no laboratório de ${sala} começa em 10 minutos!`,
-          icon: '/icon.png',
-          vibrate: [200, 100, 200]
-        });
-      });
-    }, tempoAteODisparo);
-  }
-}
-
 setInterval(() => {
   loadAndRender();
-}, 600000);
+}, 300000);
 
 document.addEventListener('DOMContentLoaded', () => {
   carregarProximasAulas();

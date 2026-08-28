@@ -48,9 +48,33 @@ app.get('/api/agendamentos', async (req, res) => {
   }
 });
 
+async function agendarNotificacaoOneSignal(subscriptionId, nome, local, dataHoraDisparo) {
+  try {
+    const response = await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${process.env.ONESIGNAL_REST_KEY}`
+      },
+      body: JSON.stringify({
+        app_id: process.env.ONESIGNAL_APP_ID,
+        include_subscription_ids: [subscriptionId], // Notifica especificamente este celular
+        contents: { pt: `Olá ${nome}, sua reserva na sala de ${local} começa em 10 minutos!` },
+        headings: { pt: 'Lembrete de Aula 📅' },
+        send_after: dataHoraDisparo.toISOString() // Data formatada em ISO UTC para o agendamento
+      })
+    });
+
+    const data = await response.json();
+    console.log('Notificação agendada no OneSignal:', data);
+  } catch (error) {
+    console.error('Erro ao agendar notificação no OneSignal:', error);
+  }
+}
+
 // Rota POST: criar novo agendamento
 app.post('/api/agendamentos', async (req, res) => {
-  const { nome, data, horario, local } = req.body;
+  const { nome, data, horario, local, onesignalId } = req.body;
   if (!nome || !data || !horario || !local) {
     return res.status(400).json({ error: 'Campos obrigatórios faltando' });
   }
@@ -67,6 +91,14 @@ app.post('/api/agendamentos', async (req, res) => {
     }
     res.status(500).json({ error: err.message });
   }
+    if (onesignalId) {
+      const horaInicial = horario.split('/')[0];
+      const dataHoraAula = new Date(`${data}T${horaInicial}:00`);
+      const dataHoraNotificacao = new Date(dataHoraAula.getTime() - (10 * 60 * 1000));
+      if (dataHoraNotificacao > new Date()) {
+        agendarNotificacaoOneSignal(onesignalId, nome, local, dataHoraNotificacao);
+      }
+    }
 });
 
 // Rota DELETE: cancelar agendamento por ID
