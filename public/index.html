@@ -75,5 +75,43 @@
       });
     }
   </script>
+
+  <!-- Botão Flutuante de Ajuda -->
+  <button id="btn-ajuda-ios" class="btn-ajuda-ios" onclick="abrirGuiaIOS()" style="display: none;">
+    <span>📲 Guia de instalação para iPhone</span>
+  </button>
+
+  <!-- Modal com o Conteúdo Trabalhado do Passo a Passo -->
+  <div id="modal-guia-ios" class="ios-modal-overlay" style="display: none;" onclick="fecharGuiaIOSNoFundo(event)">
+    <div class="ios-modal-card">
+      <button class="ios-modal-close" onclick="fecharGuiaIOS()">&times;</button>
+      
+      <div class="ios-modal-header">
+        <span class="ios-icon">📲</span>
+        <h3>Instalar na Tela de Início</h3>
+      </div>
+      
+      <p class="ios-modal-subtitle">Adicione o app ao seu iPhone para ter acesso rápido e em tela cheia:</p>
+
+      <div class="ios-steps-list">
+        <div class="ios-step-item">
+          <span class="step-num">1</span>
+          <p>No Safari, toque no botão <strong>Compartilhar</strong> <span class="badge-icon">📤</span> na barra inferior.</p>
+        </div>
+
+        <div class="ios-step-item">
+          <span class="step-num">2</span>
+          <p>Role o menu para baixo e selecione <strong>"Adicionar à Tela de Início"</strong> <span class="badge-icon">➕</span>.</p>
+        </div>
+
+        <div class="ios-step-item">
+          <span class="step-num">3</span>
+          <p>Toque em <strong>Adicionar</strong> no canto superior direito para confirmar.</p>
+        </div>
+      </div>
+
+      <button onclick="fecharGuiaIOS()" class="ios-btn-entendi">Entendi!</button>
+    </div>
+  </div>
 </body>
 </html>

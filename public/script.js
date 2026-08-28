@@ -261,6 +261,37 @@ function getCorPorLocal(local) {
   }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  verificarExibicaoBotaoIOS();
+});
+
+function verificarExibicaoBotaoIOS() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isIOS && !isStandalone) {
+    const btn = document.getElementById('btn-ajuda-ios');
+    if (btn) btn.style.display = 'block';
+  }
+}
+
+function abrirGuiaIOS() {
+  const modal = document.getElementById('modal-guia-ios');
+  if (modal) modal.style.display = 'flex';
+}
+
+function fecharGuiaIOS() {
+  const modal = document.getElementById('modal-guia-ios');
+  if (modal) modal.style.display = 'none';
+}
+
+function fecharGuiaIOSNoFundo(event) {
+  if (event.target.id === 'modal-guia-ios') {
+    fecharGuiaIOS();
+  }
+}
+
 setInterval(() => {
   loadAndRender();
 }, 300000);

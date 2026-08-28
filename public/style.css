@@ -171,3 +171,150 @@ body {
 .tabela-aulas tr:hover {
   background-color: #e0f7fa;
 }
+
+/*Botao*/
+.btn-ajuda-ios {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ffffff;
+  color: #333333;
+  border: 1px solid #e0e0e0;
+  padding: 10px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  cursor: pointer;
+  z-index: 9998;
+  transition: transform 0.2s;
+}
+
+.btn-ajuda-ios:active {
+  transform: scale(0.96);
+}
+
+.ios-modal-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.ios-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 340px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: modalSurgir 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSurgir {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ios-modal-close {
+  position: absolute;
+  top: 14px; 
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+}
+
+.ios-modal-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.ios-modal-header .ios-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ios-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111;
+  font-weight: 700;
+}
+
+.ios-modal-subtitle {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.ios-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ios-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ios-step-item .step-num {
+  background: #6f9c22;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ios-step-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.badge-icon {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.ios-btn-entendi {
+  width: 100%;
+  background: #6f9c22;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+} 
