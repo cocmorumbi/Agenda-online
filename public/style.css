@@ -202,10 +202,10 @@ body {
   display: inline-block;
 }
 
-.dot.Informatica { background-color: #2563eb; }
-.dot.Auditorio   { background-color: #9333ea; }
-.dot.Quimica     { background-color: #16a34a; }
-.dot.Matematica  { background-color: #ea580c; }
+.dot.Informatica { background-color: #00ff22; }
+.dot.Auditorio   { background-color: #ea3333; }
+.dot.Quimica     { background-color: #0077ff; }
+.dot.Matematica  { background-color: #e5ff00; }
 .dot.Padrao      { background-color: #6b7280; }
 
 /* Modal Tradicional */
@@ -545,4 +545,66 @@ body {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.secao-titulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.divisor-drawer {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 15px 0;
+}
+
+.form-drawer .form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-drawer label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-drawer input,
+.form-drawer select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.form-drawer input:focus,
+.form-drawer select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.btn-agendar-drawer {
+  width: 100%;
+  padding: 10px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.btn-agendar-drawer:hover {
+  background-color: #1d4ed8;
 }

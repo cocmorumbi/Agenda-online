@@ -1,19 +1,18 @@
 const monthYear = document.getElementById('month-year');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
-const modal = document.getElementById('modal');
-const closeModal = document.getElementById('close-modal');
-const bookingForm = document.getElementById('booking-form');
-const selectedDateInput = document.getElementById('selected-date');
-const timeSelect = document.getElementById('time');
-const locationSelect = document.getElementById('location');
 
 // Elementos do filtro e gaveta
 const filtroSalaSelect = document.getElementById('filtro-sala');
 const drawerDetalhes = document.getElementById('drawer-detalhes');
 const drawerDataTitulo = document.getElementById('drawer-data-titulo');
 const drawerListaAgendamentos = document.getElementById('drawer-lista-agendamentos');
-const btnNovoAgendamentoDrawer = document.getElementById('btn-novo-agendamento-drawer');
+
+// Elementos do formulário interno da gaveta
+const drawerForm = document.getElementById('drawer-booking-form');
+const drawerNameInput = document.getElementById('drawer-name');
+const drawerLocationSelect = document.getElementById('drawer-location');
+const drawerTimeSelect = document.getElementById('drawer-time');
 
 const horariosFixos = [
   "07:10/08:00", "08:00/08:50", "09:00/10:10", "10:10/11:00", "11:00/11:50",
@@ -63,7 +62,6 @@ function renderCalendar(date) {
   ];
   monthYear.innerText = `${monthNames[month]} ${year}`;
 
-  const primeiroDiaMes = new Date(year, month, 1);
   const ultimoDiaMes = new Date(year, month + 1, 0);
   
   const hoje = new Date();
@@ -77,12 +75,10 @@ function renderCalendar(date) {
     const tempDate = new Date(year, month, d);
     const dayOfWeek = tempDate.getDay();
 
-    // Ignora Sábado (6) e Domingo (0)
     if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
     semanaAtual.push(tempDate);
 
-    // Se for Sexta (5) ou o último dia do mês, fecha a semana
     if (dayOfWeek === 5 || d === ultimoDiaMes.getDate()) {
       semanas.push(semanaAtual);
       semanaAtual = [];
@@ -91,7 +87,6 @@ function renderCalendar(date) {
 
   const salaFiltro = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
 
-  // Desenha cada bloco de semana
   semanas.forEach((semana, index) => {
     const semanaBloco = document.createElement('div');
     semanaBloco.className = 'semana-bloco recolhida';
@@ -99,13 +94,11 @@ function renderCalendar(date) {
     const inicioSemana = semana[0];
     const fimSemana = semana[semana.length - 1];
     
-    // Verifica se a semana contém o dia de hoje
     const contemHoje = semana.some(d => {
       const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       return dStr === hojeStr;
     });
 
-    // Se for a semana do dia de hoje (ou a primeira semana se hoje não estiver no mês), mantém aberta
     if (contemHoje || (index === 0 && !semanas.some(s => s.some(d => {
       const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       return dStr === hojeStr;
@@ -114,7 +107,6 @@ function renderCalendar(date) {
       semanaBloco.classList.add('ativa');
     }
 
-    // Header da Semana
     const semanaHeader = document.createElement('div');
     semanaHeader.className = 'semana-header';
     semanaHeader.innerHTML = `
@@ -125,7 +117,6 @@ function renderCalendar(date) {
       semanaBloco.classList.toggle('recolhida');
     });
 
-    // Corpo com os Cards dos Dias
     const semanaCorpo = document.createElement('div');
     semanaCorpo.className = 'semana-corpo';
 
@@ -144,14 +135,12 @@ function renderCalendar(date) {
       diaNum.innerText = dataDia.getDate();
       diaCard.appendChild(diaNum);
 
-      // Container de Pontinhos (Dots)
       const dotsContainer = document.createElement('div');
       dotsContainer.className = 'dots-container';
 
       const agendamentosDoDia = bookings[dateStr] || [];
       const agendamentosFiltrados = agendamentosDoDia.filter(b => salaFiltro === 'todas' || b.local === salaFiltro);
 
-      // Exibe até 3 pontinhos para manter o visual limpo
       agendamentosFiltrados.slice(0, 3).forEach(b => {
         const dot = document.createElement('span');
         const classeSala = b.local ? b.local.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : 'Padrao';
@@ -161,7 +150,6 @@ function renderCalendar(date) {
 
       diaCard.appendChild(dotsContainer);
 
-      // Clique no dia -> Abre a Gaveta (Drawer)
       diaCard.addEventListener('click', () => {
         abrirDrawer(dateStr, dataDia);
       });
@@ -176,7 +164,6 @@ function renderCalendar(date) {
   });
 }
 
-// Filtro no topo
 function filtrarEAtualizarAgenda() {
   renderCalendar(currentDate);
 }
@@ -189,6 +176,10 @@ function abrirDrawer(dateStr, dataObj) {
   const mesFmt = String(dataObj.getMonth() + 1).padStart(2, '0');
   drawerDataTitulo.innerText = `Agendamentos - ${diaFmt}/${mesFmt}/${dataObj.getFullYear()}`;
 
+  // Reseta o formulário interno da gaveta
+  if (drawerForm) drawerForm.reset();
+  if (drawerTimeSelect) drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+
   renderizarListaDrawer(dateStr);
   drawerDetalhes.classList.remove('hidden');
 }
@@ -196,7 +187,15 @@ function abrirDrawer(dateStr, dataObj) {
 function renderizarListaDrawer(dateStr) {
   drawerListaAgendamentos.innerHTML = '';
   const salaFiltro = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
-  const agendamentos = (bookings[dateStr] || []).filter(b => salaFiltro === 'todas' || b.local === salaFiltro);
+  
+  let agendamentos = (bookings[dateStr] || []).filter(b => salaFiltro === 'todas' || b.local === salaFiltro);
+
+  // ORDENAÇÃO POR HORÁRIO
+  agendamentos.sort((a, b) => {
+    const horaA = a.horario ? a.horario.split('/')[0] : '';
+    const horaB = b.horario ? b.horario.split('/')[0] : '';
+    return horaA.localeCompare(horaB);
+  });
 
   if (agendamentos.length === 0) {
     drawerListaAgendamentos.innerHTML = `<div class="sem-agendamento-msg">Nenhum agendamento para este dia.</div>`;
@@ -250,31 +249,21 @@ function fecharDrawerNoFundo(event) {
   }
 }
 
-// Ação do Botão "+ Agendar neste dia" da Gaveta
-if (btnNovoAgendamentoDrawer) {
-  btnNovoAgendamentoDrawer.addEventListener('click', () => {
-    if (diaSelecionadoDrawer) {
-      fecharDrawer();
-      selectedDateInput.value = diaSelecionadoDrawer;
-      updateHorariosDisponiveis(diaSelecionadoDrawer);
-      modal.classList.remove('hidden');
-    }
-  });
-}
+// Atualização de Horários Disponíveis no Formulário da Gaveta
+function updateHorariosDisponiveisDrawer() {
+  if (!drawerLocationSelect || !drawerTimeSelect || !diaSelecionadoDrawer) return;
 
-// Atualização de Horários Disponíveis no Form
-function updateHorariosDisponiveis(date) {
-  const selectedLocation = locationSelect.value;
+  const selectedLocation = drawerLocationSelect.value;
   if (!selectedLocation) {
-    timeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+    drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
     return;
   }
 
-  const ocupados = (bookings[date] || [])
+  const ocupados = (bookings[diaSelecionadoDrawer] || [])
     .filter(b => b.local === selectedLocation)
     .map(b => b.horario);
 
-  timeSelect.innerHTML = `<option value="">Selecione o horário</option>`;
+  drawerTimeSelect.innerHTML = `<option value="">Selecione o horário</option>`;
   horariosFixos.forEach(horario => {
     const option = document.createElement('option');
     option.value = horario;
@@ -283,60 +272,57 @@ function updateHorariosDisponiveis(date) {
       option.disabled = true;
       option.innerText += " (indisponível)";
     }
-    timeSelect.appendChild(option);
+    drawerTimeSelect.appendChild(option);
   });
 }
 
-locationSelect.addEventListener('change', () => {
-  const date = selectedDateInput.value;
-  if (date) updateHorariosDisponiveis(date);
-});
+if (drawerLocationSelect) {
+  drawerLocationSelect.addEventListener('change', updateHorariosDisponiveisDrawer);
+}
 
-// Envio do formulário de agendamento
-bookingForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const nome = document.getElementById('name').value.trim();
-  const horario = document.getElementById('time').value;
-  const local = document.getElementById('location').value;
-  const data = selectedDateInput.value;
+// Submissão do Formulário Direto na Gaveta
+if (drawerForm) {
+  drawerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = drawerNameInput.value.trim();
+    const horario = drawerTimeSelect.value;
+    const local = drawerLocationSelect.value;
+    const data = diaSelecionadoDrawer;
 
-  if (!nome || !horario || !local || !data) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-
-  let onesignalId = null;
-  if (window.OneSignal) {
-    try {
-      onesignalId = await OneSignal.User.PushSubscription.id;
-    } catch (err) {
-      console.log("Não foi possível obter ID do OneSignal:", err);
-    }
-  }
-
-  try {
-    const res = await fetch('/api/agendamentos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, data, horario, local, onesignalId }),
-    });
-    if (res.status === 409) {
-      alert("Horário já reservado para esse local.");
+    if (!nome || !horario || !local || !data) {
+      alert("Preencha todos os campos para realizar o agendamento.");
       return;
     }
-    if (!res.ok) throw new Error('Erro ao salvar agendamento');
 
-    bookingForm.reset();
-    modal.classList.add('hidden');
-    await loadAndRender();
-  } catch (err) {
-    alert(err.message);
-  }
-});
+    let onesignalId = null;
+    if (window.OneSignal) {
+      try {
+        onesignalId = await OneSignal.User.PushSubscription.id;
+      } catch (err) {
+        console.log("Não foi possível obter ID do OneSignal:", err);
+      }
+    }
 
-closeModal.addEventListener('click', () => {
-  modal.classList.add('hidden');
-});
+    try {
+      const res = await fetch('/api/agendamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, data, horario, local, onesignalId }),
+      });
+      if (res.status === 409) {
+        alert("Horário já reservado para esse local.");
+        return;
+      }
+      if (!res.ok) throw new Error('Erro ao salvar agendamento');
+
+      drawerForm.reset();
+      await loadAndRender();
+      renderizarListaDrawer(data); // Recarrega a lista do dia imediatamente
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
 
 prevBtn.addEventListener('click', () => {
   currentDate.setMonth(currentDate.getMonth() - 1);
@@ -355,7 +341,6 @@ async function loadAndRender() {
   renderCalendar(currentDate);
 }
 
-// Cores por local para utilitários externos
 function getCorPorLocal(local) {
   switch (local) {
     case 'Informática': return '#2563eb';
@@ -366,7 +351,6 @@ function getCorPorLocal(local) {
   }
 }
 
-// Suporte e Guia do iOS
 function verificarExibicaoBotaoIOS() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
@@ -417,12 +401,10 @@ function tratarGestoSwipe() {
   }
 }
 
-// Atualização automática a cada 5 minutos
 setInterval(() => {
   loadAndRender();
 }, 300000);
 
-// Inicialização da Página
 document.addEventListener('DOMContentLoaded', () => {
   verificarExibicaoBotaoIOS();
   loadAndRender();

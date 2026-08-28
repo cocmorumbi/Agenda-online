@@ -7,9 +7,9 @@
   <!-- Suporte PWA para Safari/iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Agenda Labs">
+  <meta name="apple-mobile-web-app-title" content="Calendário VGemini">
   <link rel="apple-touch-icon" href="/icon.png">
-  <title>Agenda de Laboratórios</title>
+  <title>Calendário VGemini</title>
   <link rel="stylesheet" href="style.css" />
 
   <!-- Tag de integração do Manifest -->
@@ -28,7 +28,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Agenda de Laboratórios</h1>
+    <h1>Calendário VGemini</h1>
 
     <!-- Filtro de Laboratório no Topo -->
     <div class="filtro-container">
@@ -58,40 +58,52 @@
     </div>
   </div>
 
-  <!-- Modal de Novo Agendamento -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <span id="close-modal" class="close">&times;</span>
-      <h3>Novo Agendamento</h3>
-      <form id="booking-form">
-        <input type="text" id="name" placeholder="Seu nome" required />
-        <select id="time" required>
-          <option value="">Selecione o horário</option>
-        </select>
-        <select id="location" required>
-          <option value="">Selecione o local</option>
-          <option value="Informática">Informática</option>
-          <option value="Auditório">Auditório</option>
-          <option value="Química">Química</option>
-          <option value="Matemática">Matemática</option>
-        </select>
-        <input type="hidden" id="selected-date" />
-        <button type="submit">Salvar</button>
-      </form>
-    </div>
-  </div>
-
   <!-- Gaveta Lateral / Inferior (Drawer) dos Detalhes do Dia -->
   <div id="drawer-detalhes" class="drawer-overlay hidden" onclick="fecharDrawerNoFundo(event)">
     <div class="drawer-card">
       <div class="drawer-header">
-        <h3 id="drawer-data-titulo">Agendamentos do Dia</h3>
+        <h3 id="drawer-data-titulo">Agendamentos - DD/MM/AAAA</h3>
         <button class="drawer-close" onclick="fecharDrawer()">&times;</button>
       </div>
-      <div id="drawer-lista-agendamentos" class="drawer-body">
-        <!-- Lista de agendamentos do dia entra aqui dinamicamente -->
+
+      <div class="drawer-body">
+        <!-- 1. Lista de Agendamentos Existentes (Ordenados por Horário) -->
+        <h4 class="secao-titulo">Reservas para este dia</h4>
+        <div id="drawer-lista-agendamentos">
+          <!-- Lista entra via JS -->
+        </div>
+
+        <hr class="divisor-drawer">
+
+        <!-- 2. Formulário Rápido de Agendamento Direto -->
+        <h4 class="secao-titulo">Novo Agendamento</h4>
+        <form id="drawer-booking-form" class="form-drawer">
+          <div class="form-group">
+            <label for="drawer-name">Seu Nome / Professor:</label>
+            <input type="text" id="drawer-name" placeholder="Ex: Prof. Carlos" required />
+          </div>
+
+          <div class="form-group">
+            <label for="drawer-location">Local / Sala:</label>
+            <select id="drawer-location" required>
+              <option value="">Selecione o local</option>
+              <option value="Informática">Informática</option>
+              <option value="Auditório">Auditório</option>
+              <option value="Química">Química</option>
+              <option value="Matemática">Matemática</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="drawer-time">Horário:</label>
+            <select id="drawer-time" required>
+              <option value="">Selecione o local primeiro</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-agendar-drawer">Confirmar Agendamento</button>
+        </form>
       </div>
-      <button id="btn-novo-agendamento-drawer" class="btn-novo-agendamento">+ Agendar neste dia</button>
     </div>
   </div>
 
