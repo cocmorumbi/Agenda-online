@@ -170,6 +170,13 @@ body {
   background: #d3eaff;
 }
 
+.dia-card.vazio {
+  border: none;
+  background: transparent;
+  pointer-events: none;
+  box-shadow: none;
+}
+
 .dia-card.hoje {
   background: #fff8d6;
   border-color: #6f9c22;

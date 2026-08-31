@@ -48,6 +48,7 @@ async function loadBookings(year, month) {
 }
 
 // Renderiza o calendário em blocos de semanas
+// Renderiza o calendário em blocos de semanas com alinhamento correto
 function renderCalendar(date) {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -67,7 +68,16 @@ function renderCalendar(date) {
   const hoje = new Date();
   const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-  // Monta os dias úteis do mês divididos por semanas (Segunda a Sexta)
+  // Calcula o "hoje útil" para o fim de semana (se for Sáb/Dom, considera a Sexta anterior)
+  const hojeUtil = new Date(hoje);
+  if (hoje.getDay() === 6) { // Sábado -> recua 1 dia para Sexta
+    hojeUtil.setDate(hoje.getDate() - 1);
+  } else if (hoje.getDay() === 0) { // Domingo -> recua 2 dias para Sexta
+    hojeUtil.setDate(hoje.getDate() - 2);
+  }
+  const hojeUtilStr = `${hojeUtil.getFullYear()}-${String(hojeUtil.getMonth() + 1).padStart(2, '0')}-${String(hojeUtil.getDate()).padStart(2, '0')}`;
+
+  // Monta a estrutura de semanas respeitando os dias úteis (Segunda a Sexta)
   let semanas = [];
   let semanaAtual = [];
 
@@ -75,11 +85,25 @@ function renderCalendar(date) {
     const tempDate = new Date(year, month, d);
     const dayOfWeek = tempDate.getDay();
 
+    // Pula Fim de Semana
     if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
+    // Se for o primeiro dia útil do mês e não cair na Segunda (1), preenche os vazios antes
+    if (semanas.length === 0 && semanaAtual.length === 0) {
+      const espacosVazios = dayOfWeek - 1; // 1 = Seg, 2 = Ter, etc.
+      for (let i = 0; i < espacosVazios; i++) {
+        semanaAtual.push(null);
+      }
+    }
 
     semanaAtual.push(tempDate);
 
+    // Fecha a semana se chegar na Sexta (5) ou se for o último dia útil do mês
     if (dayOfWeek === 5 || d === ultimoDiaMes.getDate()) {
+      // Preenche os vazios do final da semana se fechar antes da Sexta
+      while (semanaAtual.length < 5) {
+        semanaAtual.push(null);
+      }
       semanas.push(semanaAtual);
       semanaAtual = [];
     }
@@ -87,26 +111,30 @@ function renderCalendar(date) {
 
   const salaFiltro = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
 
+  // Renderiza os blocos de semana
   semanas.forEach((semana, index) => {
     const semanaBloco = document.createElement('div');
     semanaBloco.className = 'semana-bloco recolhida';
 
-    const inicioSemana = semana[0];
-    const fimSemana = semana[semana.length - 1];
-    
+    // Descobre as datas reais de início e fim da semana para o cabeçalho
+    const diasValidos = semana.filter(d => d !== null);
+    const inicioSemana = diasValidos[0];
+    const fimSemana = diasValidos[diasValidos.length - 1];
+
+    // Checa se esta semana contém o dia de hoje (ou a Sexta do fim de semana)
     const contemHoje = semana.some(d => {
+      if (!d) return false;
       const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      return dStr === hojeStr;
+      return dStr === hojeStr || dStr === hojeUtilStr;
     });
 
-    if (contemHoje || (index === 0 && !semanas.some(s => s.some(d => {
-      const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      return dStr === hojeStr;
-    })))) {
+    // Se for a semana atual, abre e destaca por padrão
+    if (contemHoje) {
       semanaBloco.classList.remove('recolhida');
       semanaBloco.classList.add('ativa');
     }
 
+    // Header da Semana
     const semanaHeader = document.createElement('div');
     semanaHeader.className = 'semana-header';
     semanaHeader.innerHTML = `
@@ -117,6 +145,7 @@ function renderCalendar(date) {
       semanaBloco.classList.toggle('recolhida');
     });
 
+    // Corpo do Grid da Semana
     const semanaCorpo = document.createElement('div');
     semanaCorpo.className = 'semana-corpo';
 
@@ -124,6 +153,14 @@ function renderCalendar(date) {
     semanaDiasGrid.className = 'semana-dias-grid';
 
     semana.forEach(dataDia => {
+      if (dataDia === null) {
+        // Célula vazia para manter o alinhamento correto dos dias
+        const vazioCard = document.createElement('div');
+        vazioCard.className = 'dia-card vazio';
+        semanaDiasGrid.appendChild(vazioCard);
+        return;
+      }
+
       const dateStr = `${dataDia.getFullYear()}-${String(dataDia.getMonth() + 1).padStart(2, '0')}-${String(dataDia.getDate()).padStart(2, '0')}`;
       
       const diaCard = document.createElement('div');
@@ -135,6 +172,7 @@ function renderCalendar(date) {
       diaNum.innerText = dataDia.getDate();
       diaCard.appendChild(diaNum);
 
+      // Pontinhos de agendamento
       const dotsContainer = document.createElement('div');
       dotsContainer.className = 'dots-container';
 
