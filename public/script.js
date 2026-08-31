@@ -22,6 +22,7 @@ const horariosFixos = [
 let currentDate = new Date();
 let bookings = {}; // Armazena os agendamentos vindos do backend
 let diaSelecionadoDrawer = null;
+let feriadosNacionais = {};
 
 // Gestos de Deslizar (Swipe)
 let toqueInicialX = 0;
@@ -47,7 +48,22 @@ async function loadBookings(year, month) {
   await Promise.all(promises);
 }
 
-// Renderiza o calendário em blocos de semanas
+async function carregarFeriados(ano) {
+  try {
+    const res = await fetch(`https://brasilapi.com.br/api/feriados/v1/${ano}`);
+    if (!res.ok) throw new Error('Erro ao buscar feriados');
+    const data = await res.json();
+    
+    // Mapeia para o formato YYYY-MM-DD -> Nome do Feriado
+    feriadosNacionais = {};
+    data.forEach(f => {
+      feriadosNacionais[f.date] = f.name;
+    });
+  } catch (err) {
+    console.error('Erro ao carregar feriados:', err);
+  }
+}
+
 // Renderiza o calendário em blocos de semanas com alinhamento correto
 function renderCalendar(date) {
   const year = date.getFullYear();
@@ -68,16 +84,11 @@ function renderCalendar(date) {
   const hoje = new Date();
   const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-  // Calcula o "hoje útil" para o fim de semana (se for Sáb/Dom, considera a Sexta anterior)
   const hojeUtil = new Date(hoje);
-  if (hoje.getDay() === 6) { // Sábado -> recua 1 dia para Sexta
-    hojeUtil.setDate(hoje.getDate() - 1);
-  } else if (hoje.getDay() === 0) { // Domingo -> recua 2 dias para Sexta
-    hojeUtil.setDate(hoje.getDate() - 2);
-  }
+  if (hoje.getDay() === 6) hojeUtil.setDate(hoje.getDate() - 1);
+  else if (hoje.getDay() === 0) hojeUtil.setDate(hoje.getDate() - 2);
   const hojeUtilStr = `${hojeUtil.getFullYear()}-${String(hojeUtil.getMonth() + 1).padStart(2, '0')}-${String(hojeUtil.getDate()).padStart(2, '0')}`;
 
-  // Monta a estrutura de semanas respeitando os dias úteis (Segunda a Sexta)
   let semanas = [];
   let semanaAtual = [];
 
@@ -85,12 +96,10 @@ function renderCalendar(date) {
     const tempDate = new Date(year, month, d);
     const dayOfWeek = tempDate.getDay();
 
-    // Pula Fim de Semana
     if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
-    // Se for o primeiro dia útil do mês e não cair na Segunda (1), preenche os vazios antes
     if (semanas.length === 0 && semanaAtual.length === 0) {
-      const espacosVazios = dayOfWeek - 1; // 1 = Seg, 2 = Ter, etc.
+      const espacosVazios = dayOfWeek - 1;
       for (let i = 0; i < espacosVazios; i++) {
         semanaAtual.push(null);
       }
@@ -98,9 +107,7 @@ function renderCalendar(date) {
 
     semanaAtual.push(tempDate);
 
-    // Fecha a semana se chegar na Sexta (5) ou se for o último dia útil do mês
     if (dayOfWeek === 5 || d === ultimoDiaMes.getDate()) {
-      // Preenche os vazios do final da semana se fechar antes da Sexta
       while (semanaAtual.length < 5) {
         semanaAtual.push(null);
       }
@@ -111,30 +118,25 @@ function renderCalendar(date) {
 
   const salaFiltro = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
 
-  // Renderiza os blocos de semana
   semanas.forEach((semana, index) => {
     const semanaBloco = document.createElement('div');
     semanaBloco.className = 'semana-bloco recolhida';
 
-    // Descobre as datas reais de início e fim da semana para o cabeçalho
     const diasValidos = semana.filter(d => d !== null);
     const inicioSemana = diasValidos[0];
     const fimSemana = diasValidos[diasValidos.length - 1];
 
-    // Checa se esta semana contém o dia de hoje (ou a Sexta do fim de semana)
     const contemHoje = semana.some(d => {
       if (!d) return false;
       const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       return dStr === hojeStr || dStr === hojeUtilStr;
     });
 
-    // Se for a semana atual, abre e destaca por padrão
     if (contemHoje) {
       semanaBloco.classList.remove('recolhida');
       semanaBloco.classList.add('ativa');
     }
 
-    // Header da Semana
     const semanaHeader = document.createElement('div');
     semanaHeader.className = 'semana-header';
     semanaHeader.innerHTML = `
@@ -145,7 +147,6 @@ function renderCalendar(date) {
       semanaBloco.classList.toggle('recolhida');
     });
 
-    // Corpo do Grid da Semana
     const semanaCorpo = document.createElement('div');
     semanaCorpo.className = 'semana-corpo';
 
@@ -154,7 +155,6 @@ function renderCalendar(date) {
 
     semana.forEach(dataDia => {
       if (dataDia === null) {
-        // Célula vazia para manter o alinhamento correto dos dias
         const vazioCard = document.createElement('div');
         vazioCard.className = 'dia-card vazio';
         semanaDiasGrid.appendChild(vazioCard);
@@ -162,29 +162,37 @@ function renderCalendar(date) {
       }
 
       const dateStr = `${dataDia.getFullYear()}-${String(dataDia.getMonth() + 1).padStart(2, '0')}-${String(dataDia.getDate()).padStart(2, '0')}`;
-      
+      const ehFeriado = feriadosNacionais[dateStr];
+
       const diaCard = document.createElement('div');
       diaCard.className = 'dia-card';
       if (dateStr === hojeStr) diaCard.classList.add('hoje');
+      if (ehFeriado) diaCard.classList.add('feriado');
 
       const diaNum = document.createElement('span');
       diaNum.className = 'dia-num';
       diaNum.innerText = dataDia.getDate();
       diaCard.appendChild(diaNum);
 
-      // Pontinhos de agendamento
       const dotsContainer = document.createElement('div');
       dotsContainer.className = 'dots-container';
 
-      const agendamentosDoDia = bookings[dateStr] || [];
-      const agendamentosFiltrados = agendamentosDoDia.filter(b => salaFiltro === 'todas' || b.local === salaFiltro);
+      if (ehFeriado) {
+        const badgeFeriado = document.createElement('span');
+        badgeFeriado.className = 'badge-feriado';
+        badgeFeriado.innerText = '🎉 Feriado';
+        dotsContainer.appendChild(badgeFeriado);
+      } else {
+        const agendamentosDoDia = bookings[dateStr] || [];
+        const agendamentosFiltrados = agendamentosDoDia.filter(b => salaFiltro === 'todas' || b.local === salaFiltro);
 
-      agendamentosFiltrados.slice(0, 3).forEach(b => {
-        const dot = document.createElement('span');
-        const classeSala = b.local ? b.local.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : 'Padrao';
-        dot.className = `dot ${classeSala}`;
-        dotsContainer.appendChild(dot);
-      });
+        agendamentosFiltrados.slice(0, 3).forEach(b => {
+          const dot = document.createElement('span');
+          const classeSala = b.local ? b.local.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : 'Padrao';
+          dot.className = `dot ${classeSala}`;
+          dotsContainer.appendChild(dot);
+        });
+      }
 
       diaCard.appendChild(dotsContainer);
 
@@ -214,25 +222,40 @@ function abrirDrawer(dateStr, dataObj) {
   const mesFmt = String(dataObj.getMonth() + 1).padStart(2, '0');
   drawerDataTitulo.innerText = `Agendamentos - ${diaFmt}/${mesFmt}/${dataObj.getFullYear()}`;
 
-  // Reseta o formulário interno da gaveta
   if (drawerForm) drawerForm.reset();
 
-  // PREENCHIMENTO AUTOMÁTICO BASEADO NO FILTRO DO TOPO
-  const salaFiltroAtual = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
-  
-  if (drawerLocationSelect) {
-    if (salaFiltroAtual !== 'todas') {
-      drawerLocationSelect.value = salaFiltroAtual; // Seleciona a sala do filtro
-      updateHorariosDisponiveisDrawer();            // Já carrega os horários vagos dela
-    } else {
-      drawerLocationSelect.value = '';             // Deixa em branco para o usuário escolher
-      if (drawerTimeSelect) {
-        drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+  const ehFeriado = feriadosNacionais[dateStr];
+  const btnSubmit = drawerForm ? drawerForm.querySelector('button[type="submit"]') : null;
+
+  if (ehFeriado) {
+    // Exibe mensagem de feriado e OCULTA os campos do formulário
+    drawerListaAgendamentos.innerHTML = `
+      <div class="msg-feriado-box">
+        <span>🎉</span>
+        <h4>${ehFeriado}</h4>
+        <p>Dia letivo suspenso / Feriado Nacional. Não é possível realizar agendamentos nesta data.</p>
+      </div>
+    `;
+    if (drawerForm) drawerForm.style.display = 'none';
+  } else {
+    // Dia normal: exibe o formulário e carrega as reservas
+    if (drawerForm) drawerForm.style.display = 'block';
+
+    const salaFiltroAtual = filtroSalaSelect ? filtroSalaSelect.value : 'todas';
+    if (drawerLocationSelect) {
+      if (salaFiltroAtual !== 'todas') {
+        drawerLocationSelect.value = salaFiltroAtual;
+        updateHorariosDisponiveisDrawer();
+      } else {
+        drawerLocationSelect.value = '';
+        if (drawerTimeSelect) {
+          drawerTimeSelect.innerHTML = `<option value="">Selecione o local primeiro</option>`;
+        }
       }
     }
+    renderizarListaDrawer(dateStr);
   }
 
-  renderizarListaDrawer(dateStr);
   drawerDetalhes.classList.remove('hidden');
 }
 
@@ -389,7 +412,13 @@ nextBtn.addEventListener('click', () => {
 async function loadAndRender() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  await loadBookings(year, month);
+  
+  // Carrega feriados e agendamentos em paralelo
+  await Promise.all([
+    carregarFeriados(year),
+    loadBookings(year, month)
+  ]);
+  
   renderCalendar(currentDate);
 }
 
