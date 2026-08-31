@@ -170,13 +170,6 @@ body {
   background: #d3eaff;
 }
 
-.dia-card.vazio {
-  border: none;
-  background: transparent;
-  pointer-events: none;
-  box-shadow: none;
-}
-
 .dia-card.hoje {
   background: #fff8d6;
   border-color: #6f9c22;
@@ -190,51 +183,6 @@ body {
   font-weight: bold;
   font-size: 14px;
   color: #242527;
-}
-
-/* Estilo dos Cards de Feriado no Calendário */
-.dia-card.feriado {
-  background-color: #fef2f2;
-  border-color: #fca5a5;
-}
-
-.badge-feriado {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: #dc2626;
-  background-color: #fee2e2;
-  padding: 2px 4px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-top: 2px;
-}
-
-/* Mensagem de Feriado Dentro da Gaveta */
-.msg-feriado-box {
-  text-align: center;
-  padding: 20px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  margin: 10px 0;
-}
-
-.msg-feriado-box span {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: 5px;
-}
-
-.msg-feriado-box h4 {
-  color: #991b1b;
-  font-size: 1.1rem;
-  margin-bottom: 5px;
-}
-
-.msg-feriado-box p {
-  color: #7f1d1d;
-  font-size: 0.85rem;
-  margin: 0;
 }
 
 /* Pontinhos Indicadores (Dots) */
