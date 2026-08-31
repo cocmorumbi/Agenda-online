@@ -50,55 +50,78 @@ app.get('/api/agendamentos', async (req, res) => {
 
 async function agendarNotificacaoOneSignal(subscriptionId, nome, local, dataHoraDisparo) {
   try {
+    const dataObj = new Date(dataHoraDisparo);
+    // Converte e formata a data para ISO UTC estrito aceito pelo OneSignal
+    const sendAfterFormatted = dataObj.toISOString(); 
+
     const response = await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
         'Authorization': `Basic ${process.env.ONESIGNAL_REST_KEY}`
       },
       body: JSON.stringify({
         app_id: process.env.ONESIGNAL_APP_ID,
-        include_subscription_ids: [subscriptionId], // Notifica especificamente este celular
-        contents: { pt: `Olá ${nome}, sua reserva na sala de ${local} começa em 10 minutos!` },
-        headings: { pt: 'Lembrete de Aula 📅' },
-        send_after: dataHoraDisparo.toISOString() // Data formatada em ISO UTC para o agendamento
+        include_subscription_ids: [subscriptionId], // Notifica apenas o dispositivo alvo
+        contents: { pt: `Olá ${nome}, sua reserva no local ${local} começa em 10 minutos!`, en: `Hello ${nome}, your reservation starts in 10 minutes!` },
+        headings: { pt: 'Lembrete de Aula 📅', en: 'Class Reminder 📅' },
+        send_after: sendAfterFormatted
       })
     });
 
     const data = await response.json();
-    console.log('Notificação agendada no OneSignal:', data);
+
+    if (!response.ok) {
+      console.error('❌ Erro retornado pela API do OneSignal:', data);
+      return null;
+    }
+
+    console.log('✅ Notificação agendada com sucesso no OneSignal:', data);
+    return data;
+
   } catch (error) {
-    console.error('Erro ao agendar notificação no OneSignal:', error);
+    console.error('❌ Erro na requisição HTTP com o OneSignal:', error);
+    return null;
   }
 }
 
 // Rota POST: criar novo agendamento
 app.post('/api/agendamentos', async (req, res) => {
   const { nome, data, horario, local, onesignalId } = req.body;
+
   if (!nome || !data || !horario || !local) {
     return res.status(400).json({ error: 'Campos obrigatórios faltando' });
   }
 
   try {
-    await pool.query(
-      'INSERT INTO agendamentos (nome, data, horario, local) VALUES ($1, $2, $3, $4)',
-      [nome, data, horario, local]
+    const result = await pool.query(
+      'INSERT INTO agendamentos (nome, data, horario, local, onesignal_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [nome, data, horario, local, onesignalId || null]
     );
-    res.status(201).json({ message: 'Agendamento criado com sucesso!' });
-  } catch (err) {
-    if (err.code === '23505') { // código de violação de UNIQUE constraint no Postgres
-      return res.status(409).json({ error: 'Horário já reservado para esse local' });
-    }
-    res.status(500).json({ error: err.message });
-  }
+
     if (onesignalId) {
-      const horaInicial = horario.split('/')[0];
-      const dataHoraAula = new Date(`${data}T${horaInicial}:00`);
+      const horaInicial = horario.split('/')[0]; 
+      
+      const dataHoraAula = new Date(`${data}T${horaInicial}:00-03:00`); // Fuso de Brasília (-03:00)
       const dataHoraNotificacao = new Date(dataHoraAula.getTime() - (10 * 60 * 1000));
+
       if (dataHoraNotificacao > new Date()) {
-        agendarNotificacaoOneSignal(onesignalId, nome, local, dataHoraNotificacao);
+        await agendarNotificacaoOneSignal(onesignalId, nome, local, dataHoraNotificacao);
       }
     }
+
+    res.status(201).json({ 
+      message: 'Agendamento criado com sucesso!', 
+      agendamento: result.rows[0] 
+    });
+
+  } catch (err) {
+    if (err.code === '23505') { // Violação de constraint UNIQUE
+      return res.status(409).json({ error: 'Horário já reservado para esse local' });
+    }
+    console.error('Erro ao agendar:', err);
+    res.status(500).json({ error: 'Erro interno ao processar o agendamento' });
+  }
 });
 
 // Rota DELETE: cancelar agendamento por ID

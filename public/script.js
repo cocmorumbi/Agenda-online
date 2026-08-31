@@ -489,4 +489,18 @@ setInterval(() => {
 document.addEventListener('DOMContentLoaded', () => {
   verificarExibicaoBotaoIOS();
   loadAndRender();
+
+  // Inicialização e captura do Subscription ID do OneSignal v16
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "Sc466bdc7-0640-4489-a2ff-b360e4e3c535",
+      allowLocalhostAsSecureOrigin: true, 
+      notifyButton: {
+        enable: true, 
+      },
+    });
+
+    await OneSignal.Notifications.requestPermission();
+  });
 });
