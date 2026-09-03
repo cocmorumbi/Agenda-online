@@ -1,160 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#6f9c22">
-  <!-- Suporte PWA para Safari/iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Calendário VGemini">
-  <link rel="apple-touch-icon" href="/icon.png">
-  <title>Agenda de Laboratórios</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Tag de integração do Manifest -->
-  <link rel="manifest" href="/manifest.json">
-
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: 'c466bdc7-0640-4489-a2ff-b360e4e3c535',
-      });
-      await OneSignal.User.setLanguage("pt");
-    });
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Endereço - Agendamentos</title>
+    <!-- Redireciona automaticamente após 5 segundos -->
+    <meta http-equiv="refresh" content="5;url=https://laboratorios-coc.onrender.com/">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
+        .box {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+        }
+        h1 {
+            color: #6f9c22;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        a.btn {
+            display: inline-block;
+            background-color: #6f9c22;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        a.btn:hover {
+            background-color: #55791a;
+        }
+        .countdown {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Agenda de Laboratórios</h1>
-
-    <!-- Filtro de Laboratório no Topo -->
-    <div class="filtro-container">
-      <label for="filtro-sala">Filtrar por Sala:</label>
-      <select id="filtro-sala" onchange="filtrarEAtualizarAgenda()">
-        <option value="todas">Todas as Salas</option>
-        <option value="Informática">Informática</option>
-        <option value="Auditório">Auditório</option>
-        <option value="Química">Química</option>
-        <option value="Matemática">Matemática</option>
-      </select>
+    <div class="box">
+        <h1>Nosso site mudou de endereço!</h1>
+        <p>A página de agendamentos foi transferida para um novo servidor oficial. Você será redirecionado automaticamente em instantes.</p>
+        
+        <a href="https://laboratorios-coc.onrender.com/" class="btn">Acessar Novo Site Agora</a>
+        
+        <div class="countdown">Se não for redirecionado, clique no botão acima.</div>
     </div>
-
-    <!-- Navegação de Mês/Ano -->
-    <div class="header">
-      <button id="prev">◀</button>
-      <h2 id="month-year"></h2>
-      <button id="next">▶</button>
-    </div>
-
-    <!-- Container das Semanas Dobráveis (Geradas via JS) -->
-    <div class="calendar" id="calendar-container">
-      <div class="weekdays">
-        <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div>
-      </div>
-      <div id="weeks-wrapper"></div>
-    </div>
-  </div>
-
-  <!-- Gaveta Lateral / Inferior (Drawer) dos Detalhes do Dia -->
-  <div id="drawer-detalhes" class="drawer-overlay hidden" onclick="fecharDrawerNoFundo(event)">
-    <div class="drawer-card">
-      <div class="drawer-header">
-        <h3 id="drawer-data-titulo">Agendamentos - DD/MM/AAAA</h3>
-        <button class="drawer-close" onclick="fecharDrawer()">&times;</button>
-      </div>
-
-      <div class="drawer-body">
-        <!-- 1. Lista de Agendamentos Existentes (Ordenados por Horário) -->
-        <h4 class="secao-titulo">Reservas para este dia</h4>
-        <div id="drawer-lista-agendamentos">
-          <!-- Lista entra via JS -->
-        </div>
-
-        <hr class="divisor-drawer">
-
-        <!-- 2. Formulário Rápido de Agendamento Direto -->
-        <h4 class="secao-titulo">Novo Agendamento</h4>
-        <form id="drawer-booking-form" class="form-drawer">
-          <div class="form-group">
-            <label for="drawer-name">Seu Nome / Professor:</label>
-            <input type="text" id="drawer-name" placeholder="Ex: Prof. Carlos" required />
-          </div>
-
-          <div class="form-group">
-            <label for="drawer-location">Local / Sala:</label>
-            <select id="drawer-location" required>
-              <option value="">Selecione o local</option>
-              <option value="Informática">Informática</option>
-              <option value="Auditório">Auditório</option>
-              <option value="Química">Química</option>
-              <option value="Matemática">Matemática</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="drawer-time">Horário:</label>
-            <select id="drawer-time" required>
-              <option value="">Selecione o local primeiro</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn-agendar-drawer">Confirmar Agendamento</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Service Worker Script -->
-  <script src="script.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((reg) => console.log('PWA Service Worker registrado com sucesso! Scope: ', reg.scope))
-          .catch((err) => console.error('Falha ao registrar Service Worker: ', err));
-      });
-    }
-  </script>
-
-  <!-- Botão Flutuante de Ajuda iOS -->
-  <button id="btn-ajuda-ios" class="btn-ajuda-ios" onclick="abrirGuiaIOS()" style="display: none;">
-    <span>📲 Guia de instalação para iPhone</span>
-  </button>
-
-  <!-- Modal de Instalação iOS -->
-  <div id="modal-guia-ios" class="ios-modal-overlay" style="display: none;" onclick="fecharGuiaIOSNoFundo(event)">
-    <div class="ios-modal-card">
-      <button class="ios-modal-close" onclick="fecharGuiaIOS()">&times;</button>
-      
-      <div class="ios-modal-header">
-        <span class="ios-icon">📲</span>
-        <h3>Instalar na Tela de Início</h3>
-      </div>
-      
-      <p class="ios-modal-subtitle">Adicione o app ao seu iPhone para ter acesso rápido e em tela cheia:</p>
-
-      <div class="ios-steps-list">
-        <div class="ios-step-item">
-          <span class="step-num">1</span>
-          <p>No Safari, toque no botão <strong>Compartilhar</strong> <span class="badge-icon">📤</span> na barra inferior.</p>
-        </div>
-
-        <div class="ios-step-item">
-          <span class="step-num">2</span>
-          <p>Role o menu para baixo e selecione <strong>"Adicionar à Tela de Início"</strong> <span class="badge-icon">➕</span>.</p>
-        </div>
-
-        <div class="ios-step-item">
-          <span class="step-num">3</span>
-          <p>Toque em <strong>Adicionar</strong> no canto superior direito para confirmar.</p>
-        </div>
-      </div>
-
-      <button onclick="fecharGuiaIOS()" class="ios-btn-entendi">Entendi!</button>
-    </div>
-  </div>
 </body>
 </html>

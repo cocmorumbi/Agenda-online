@@ -233,7 +233,7 @@ function abrirDrawer(dateStr, dataObj) {
       <div class="msg-feriado-box">
         <span>🎉</span>
         <h4>${ehFeriado}</h4>
-        <p>Dia letivo suspenso / Feriado Nacional. Não é possível realizar agendamentos nesta data.</p>
+        <p>Não é possível realizar agendamentos nesta data.</p>
       </div>
     `;
     if (drawerForm) drawerForm.style.display = 'none';
